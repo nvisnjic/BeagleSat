@@ -2,7 +2,7 @@
 A close relative of Laika.
 
 
-No one knows it true name, Some say it goes by as:
+No one knows it's true name, some say it goes by as:
 
 * Cerberus
 * Anubis
@@ -12,4 +12,4 @@ No one knows it true name, Some say it goes by as:
 * Rover
 * Sparky
 
-and sometimes even Mr. Whiskers. Buy you better not say that in his face.
+and sometimes even Mr. Whiskers. Buy you better not say that to his face.
