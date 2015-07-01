@@ -41,15 +41,15 @@ P = -1 * inv(X_mat'*X_mat)*X_mat'*ones(1,size)';
 
 % Used in MATLAB to solve, but we can use symbolic solution direclty
 if(0)
-    syms Bh Bx By Bmx Bmy a b phi y0 x0
+    syms Bh Bx By Bmx Bmy a b rho y0 x0
     Bh = 1
-    [a_solve, b_solve, phi_solve, x0_solve, y0_solve] = ...
+    [a_solve, b_solve, rho_solve, x0_solve, y0_solve] = ...
                 solve( [    b^2/a^2 == P(1), 
-                (-2*sin(phi)*a*b )/a^2== P(2),
-                (2*sin(phi)*a*b*y0 - 2*b^2*x0 ) /a^2 == P(3),
-                (2*sin(phi)*a*b*x0 - 2*a^2*y0 ) /a^2 == P(4),
-                (a^2*y0^2 + b^2*x0^2 - 2*sin(phi)*a*b*x0*y0)/a^2 ...
-                + b^2*(sin(phi)^2 - 1)*Bh^2 == P(5)
+                (-2*sin(rho)*a*b )/a^2== P(2),
+                (2*sin(rho)*a*b*y0 - 2*b^2*x0 ) /a^2 == P(3),
+                (2*sin(rho)*a*b*x0 - 2*a^2*y0 ) /a^2 == P(4),
+                (a^2*y0^2 + b^2*x0^2 - 2*sin(rho)*a*b*x0*y0)/a^2 ...
+                + b^2*(sin(rho)^2 - 1)*Bh^2 == P(5)
             ]);
 end
 
@@ -64,19 +64,19 @@ b_cor = double( -1 * (2*(AC*(FC*BC^2 - BC*DC*EC + DC^2 + AC*EC^2 ...
                     - 4*AC*FC))^(1/2))/(Bh*BC^2 - 4*AC*Bh) )
 x0_cor = double(  -(2*DC - BC*EC)/(- BC^2 + 4*AC) )
 y0_cor = double( -(2*AC*EC - BC*DC)/(- BC^2 + 4*AC) )
-phi_cor = double(pi + asin((BC*(1/AC)^(1/2))/2) )
+rho_cor = double(pi + asin((BC*(1/AC)^(1/2))/2) )
 
 % Fix the measured data with the correction factors
 
 x_fixed = (xn - x0_cor) / a_cor;
-y_fixed = -(y0_cor - yn + (b_cor*sin(phi_cor)*(xn - x0_cor))/a_cor)/ ...
-        (b_cor*cos(phi_cor)); 
+y_fixed = -(y0_cor - yn + (b_cor*sin(rho_cor)*(xn - x0_cor))/a_cor)/ ...
+        (b_cor*cos(rho_cor)); 
 
 
 % Compute percent error
 factor_error_percent = abs([a_e - a_cor, b_e - b_cor, x0_e - x0_cor, ...
             y0_e - y0_cor, ... % angle shannanigans 
-            theta0 - mod(phi_cor, pi) ]) * 100
+            theta0 - mod(rho_cor, pi) ]) * 100
     
 % Print all the good stuff
 
