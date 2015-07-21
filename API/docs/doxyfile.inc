@@ -1,3 +1,3 @@
 INPUT = ./src ./src/beaglesat_sensors.h
-FILE_PATTERNS = medians_1D.h
+FILE_PATTERNS = *.h
 OUTPUT_DIRECTORY = ./docs
