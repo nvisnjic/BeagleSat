@@ -45,7 +45,19 @@ typedef struct BeagleSat {
     IGRF currentIGRF;   /**< Set geomagnetic reference value            */
     sensor *sensorList; /**< list of all registered sensor devices      */ 
     //telemetry, comms, other stuff..
-}
+};
+
+/**
+ * @brief Coordinate triplet structure
+ * Structure containing X, Y & Z measurement data
+ */
+typedef struct XYZdata {
+    float X; 
+    float Y;
+    float Z;
+};
+
+
 
 
 /**
@@ -57,29 +69,49 @@ void BeagleSat_init(struct BeagleSat *sat, char *config_path) {
     
 }
 
-void BeagleSat_getRawVelocity(struct BeagleSat *sat, float *x, float *y, float *z) {
-    *x = 1;
-    *y = 1;
-    *z = 1;
+/**
+*
+* @brief Get unprocessed data from sensor
+* @todo sensorID should be an enum (probably?) to avoid confusion with
+* numerical ID memorization. 
+* @todo Is it a good idea to return the triplet? 
+* probably not, but it's useful from a usability perspective, maybe, 
+* returning int would be better for error checking though.
+*/
+struct XYZdata BeagleSat_getRawData(struct BeagleSat *sat, int sensorID) {
+    
+    char *devicePointer = sat->sensorList[sensorID]->device;
+    /* Read from sysfs device driver and get triplet*/
+    // struct XYZdata dataRead =  
+    
+    return XYZdata
 }
 
 /**
  * @brief Example showing how to document a function with Doxygen.
  * @warning Warning.
  */
-int BeagleSat_getVelocity(struct BeagleSat *sat, float *x, float *y, float *z) {
-    float x_raw, y_raw, z_raw;
-    BeagleSat_getRawVelocity(sat, &x_raw, &y_raw, &z_raw);
+struct XYZdata BeagleSat_getCorrectedData(struct BeagleSat *sat, int sensorID) {
+     
+    struct XYZdata dataIn = BeagleSat_getRawData(sat, sensorID);
+    struct XYZdata correctedData;
 
-    if (sat->filter_enabled) {
-        BeagleSat_filterVelocity(&x_raw, &y_raw, &z_raw);
+    //* Invoke computation of Correction parameters, or load stored ones */
+    struct params correctionParams =
+            BeagleSat_computeParameters(sat, SensorID); 
+            // this is tricky, since there are a huge number of options
+            // lets say, we have smart defaults for now...
+             
+
+// @todo filter enabled keep/drop?
+    if (sat->sensor[sensorID]->filter_enabled) { 
+        correctedData = BeagleSat_correctData(dataIn, correctionParams);
     }
     else {
-        *x = x_raw;
-        *y = y_raw;
-        *z = z_raw
+        correctedData = dataIn;
     }
-    return 1;
+
+    return XYZdata;
 }
 
 #endif /* _BEAGLESAT_SENSORS_H_ */
