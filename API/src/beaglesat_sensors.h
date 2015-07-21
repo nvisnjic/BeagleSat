@@ -103,7 +103,7 @@ struct XYZdata BeagleSat_getCorrectedData(struct BeagleSat *sat, int sensorID) {
             // lets say, we have smart defaults for now...
              
 
-// @todo filter enabled keep/drop?
+/// @todo filter enabled flag; keep/drop?
     if (sat->sensor[sensorID]->filter_enabled) { 
         correctedData = BeagleSat_correctData(dataIn, correctionParams);
     }
