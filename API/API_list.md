@@ -2,10 +2,10 @@
 
 ## Sensors ##
 
-*Requirements*
+* Requirements *
 
 * Easy access to stored sensor data (both processed and unprocessed)
-* Store all data required for real-time correction and later correction
+* Store all data required for real-time correction and postponed correction
 * Link processed data to used corr. parameters
 * Initiate computation of correction parameters
 * Update IGRF reference
@@ -17,7 +17,7 @@
 * Connection to Comms?
 
 
-*Use cases*
+* Use cases *
 
 * Time-variant correction of real-time sensor data
 * Time-variant correction based on previously collected data
