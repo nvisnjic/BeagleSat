@@ -23,6 +23,9 @@ yn = y + noise * 2 * (rand(1, length(y))-.5);
 x_nice = sin(t);
 y_nice = cos(t);
 
+% Measure time
+tic();
+
 % Basis function Matrix
 X_mat = [   xn.^2 ./yn.^2;   (xn.*yn) ./yn.^2;
             xn    ./yn.^2;   yn       ./yn.^2;
@@ -72,6 +75,9 @@ x_fixed = (xn - x0_cor) / a_cor;
 y_fixed = -(y0_cor - yn + (b_cor*sin(rho_cor)*(xn - x0_cor))/a_cor)/ ...
         (b_cor*cos(rho_cor)); 
 
+
+% How long did it take
+toc();
 
 % Compute percent error
 factor_error_percent = abs([a_e - a_cor, b_e - b_cor, x0_e - x0_cor, ...
