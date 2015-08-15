@@ -21,6 +21,7 @@ class BeagleSat(object):
     """ Initialize BeagleSat object for further usage """
 
     self.sensorList = {} # Create empty dictionary to track registered sensors
+    self.currentIGRF  # Holds the current IGRF value for corr. factor computation
     # done with init()
 
   def saveConfiguration(self, file):
@@ -54,6 +55,12 @@ class BeagleSat(object):
 
     del self.sensorList[sensorID]
 
+  def computeCorrectionFactors(self, sensorID):
+    """ Compute correction factors for the time invariant algorithm """
+    
+  def computeCorrectionFactorsVariant(self, sensorID, params):
+    """ Compute correction factors for the time variant algorithm """
+
   def getRawMagData(self,  sensorID = 0):
     """ Read magnetometer data from sensor registered on ID sensorID
         and return data without processing it with error correction
@@ -66,7 +73,6 @@ class BeagleSat(object):
     sensor = self.sensorList[sensorID]
     # Read single triplet of X Y Z magnetometer datag()
     return sensor.getMag()
-
 
   def getCorrectedMagData(self, sensorID = 0, algorithmType = 0):
     """ Read magnetometer data from sensor registered on ID sensorID
