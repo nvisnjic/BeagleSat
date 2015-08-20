@@ -12,7 +12,7 @@ from bbio import *
 from bbio.libraries.MPU9250 import MPU9250
 
 # We're gonna need the data correction libraries as well 
-from beaglesatCorrection import *
+from correction import *
 
 class BeagleSat(object):
 
@@ -36,13 +36,13 @@ class BeagleSat(object):
         on the BeagleSat platform, doing appropriate checks
     """
     if sensorID in self.sensorList: # Check if ID already taken
-      print "Sensor ID = %s already taken, please choose another\n" % sensorID
+      print("Sensor ID = %s already taken, please choose another\n") % sensorID
       return -1
 
     if (sensorType == "MPU9250"):
       mpu = MPU9250(sensorConnection) # sensorConnection should be SPI0
       if (mpu.sensorOnline == 1):
-        print "MPU9250 sensor initialized via SPI0, sensor registered on ID = %s\n" % sensorID
+        print("MPU9250 sensor initialized via SPI0, sensor registered on ID = %s\n") % sensorID
       # Add sensor to list of sensors
       self.sensorList[sensorID] = mpu
 
@@ -50,7 +50,7 @@ class BeagleSat(object):
     """ Remove sensor with sensorID ID from list of sensors """      
     # Test if we got a correct sensorID
     if not (sensorID in self.sensorList):
-      print "Invalid sensor ID for unregister, please provide a valid sensor ID\n"
+      print("Invalid sensor ID for unregister, please provide a valid sensor ID\n")
       return -1
 
     del self.sensorList[sensorID]
@@ -67,7 +67,7 @@ class BeagleSat(object):
     """
     # Test if we got a correct sensorID
     if not (sensorID in self.sensorList):
-      print "Invalid sensor ID, please provide a valid sensor ID for data correction\n"
+      print("Invalid sensor ID, please provide a valid sensor ID for data correction\n")
       return -1
  
     sensor = self.sensorList[sensorID]
@@ -84,7 +84,7 @@ class BeagleSat(object):
     """	 
     # Test if we got a correct sensorID
     if not (sensorID in self.sensorList):
-      print "Invalid sensor ID, please provide a valid sensor ID for data correction\n"
+      print("Invalid sensor ID, please provide a valid sensor ID for data correction\n")
       return -1
 
     sensor = self.sensorList[sensorID]
