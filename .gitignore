@@ -4,3 +4,4 @@ testing/
 # Ignore python intermediates
 *.pyc
 */__pycache__/
+*.egg-info
