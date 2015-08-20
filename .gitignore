@@ -1,2 +1,6 @@
+# Ignore stuff that's non permanent
 testing/
 *.swp
+# Ignore python intermediates
+*.pyc
+*/__pycache__/
