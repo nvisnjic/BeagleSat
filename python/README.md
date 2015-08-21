@@ -7,5 +7,6 @@ ground up, while expanding the CubeSat community and bringing space that
 much closer to anyone willing to hack.
 
 For more information see:
-https://github.com/nvisnjic/BeagleSat
-http://nvisnjic.com/beaglesat
+
+* https://github.com/nvisnjic/BeagleSat
+* http://nvisnjic.com/beaglesat
