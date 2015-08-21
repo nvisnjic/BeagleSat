@@ -32,7 +32,7 @@ print("\n\tFirst 5 readouts from magnetometer: (uT) \n")
 print(sensorData[0:3, 0:5]) # it's a numpy array, so we use numpy indexing
 
 # Store data in a file
-Laika.storeData(sensorData,'./data/tempStore' , 0)
+Laika.storeData(sensorData,'./data/tempStore' , stampTime = 0)
 
 # Read that data back (you probably use this in some more meaningful way)
 XYZdata = Laika.loadData('./data/tempStore')
@@ -48,10 +48,10 @@ print(Laika.sensorList["MPU_1"].corrFactors)
 newData = Laika.getRawMagData( "MPU_1", nrSamples = 25, sampleDelay = 0.5)
 
 # Correct new data
-correctedData = Laika.correctData(newData, "MPU_1", 0)
+correctedData = Laika.correctData(newData, "MPU_1", algorithmType = 0)
 
 # and store it in a file
-Laika.storeData(correctedData,'./data/tempCorrectedStore', 0)
+Laika.storeData(correctedData,'./data/tempCorrectedStore', stampTime = 0)
 
 
 print("\n\tFirst 5 readouts from corrected magnetometer: (uT) \n")
