@@ -1,7 +1,7 @@
 # BeagleSat
 
 <p align="center">
-<img src="http://nvisnjic.com/beaglesat/beaglesat.png">
+<img  width="400px" src="http://nvisnjic.com/beaglesat/beaglesat.png">
 </p>
 
 Copyright (c) 2015 - Niko Visnjic <self@nvisnjic.com>
@@ -14,6 +14,8 @@ embedded development board.
 It's a framework and tool set for designing your very own CubeSat from the
 ground up, while expanding the CubeSat community and bringing space that 
 much closer to anyone willing to hack. 
+
+Take a look at: <http://nvisnjic.com/beaglesat>
 
 ## License
 
