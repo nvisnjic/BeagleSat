@@ -1,3 +1,4 @@
 # beaglesat/correction/__init__.py
 
-import correction
+from correction import invariantCorrection
+from correction import computeInvariantFactors

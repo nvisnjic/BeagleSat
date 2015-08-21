@@ -45,7 +45,7 @@ def variantCorrection(XYZdata, factors, IGRF):
       Returns a time variant corrected  dataset (X, Y, Z) * len(XYZdata)
   """ 
 
-def computeInvarantFactors(XYZdata): 
+def computeInvariantFactors(XYZdata): 
   """ Compute time invariant correction factors from a body of  
       collected data  
       Returns offset triplet (OX,OY,OZ) and scaling triplet (SX,SY,SZ)

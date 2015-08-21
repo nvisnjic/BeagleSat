@@ -7,12 +7,21 @@ A library for controlling the BeagleSat CubeSat platform
 """
 
 # We'll be using the bbio MPU9250 library for communication with the sensors
-from bbio import *
+import bbio
 # Import the MPU9250 class from the MPU9250 library:
 from bbio.libraries.MPU9250 import MPU9250
 
 # We're gonna need the data correction libraries as well 
-from correction import *
+import correction
+
+# Some arrays may be needed
+import numpy
+# Want to write a file
+import os, csv
+# Delay is good
+import time
+# timestamps are also nice
+import datetime
 
 class BeagleSat(object):
 
@@ -21,14 +30,25 @@ class BeagleSat(object):
     """ Initialize BeagleSat object for further usage """
 
     self.sensorList = {} # Create empty dictionary to track registered sensors
-    self.currentIGRF  # Holds the current IGRF value for corr. factor computation
+    self.currentIGRF = None   # Holds the current IGRF value for correction 
+                              # factor computation
     # done with init()
-
+  
   def saveConfiguration(self, file):
     """ save current setup to file """
+    pass
   
   def restoreConfiguration(self, file):
     """ restore setup from file """
+    pass
+
+  def setIGRF(self, valIGRF):
+    """ set IGRF value for BeagleSat and all registered sensors """
+    self.currentIGRF = valIGRF
+
+    # Update all registered sensors
+    for sensorID in self.sensorList:
+      self.sensorList[sensorID].IGRF = valIGRF
 
 
   def registerSensor(self, sensorID, sensorType, sensorConnection):
@@ -43,8 +63,13 @@ class BeagleSat(object):
       mpu = MPU9250(sensorConnection) # sensorConnection should be SPI0
       if (mpu.sensorOnline == 1):
         print("MPU9250 sensor initialized via SPI0, sensor registered on ID = %s\n") % sensorID
+      
+      # Construct sensor object
+      new_sensor = sensor()
+      new_sensor.device = mpu
+
       # Add sensor to list of sensors
-      self.sensorList[sensorID] = mpu
+      self.sensorList[sensorID] = new_sensor
 
   def unRegisterSensor(self, sensorID):
     """ Remove sensor with sensorID ID from list of sensors """      
@@ -55,32 +80,65 @@ class BeagleSat(object):
 
     del self.sensorList[sensorID]
 
-  def computeCorrectionFactors(self, sensorID):
+  def computeCorrectionFactors(self, sensorID, XYZdata):
     """ Compute correction factors for the time invariant algorithm """
     
+    # Test if we got a correct sensorID
+    if not (sensorID in self.sensorList):
+      print("Invalid sensor ID, please provide a valid sensor ID for invariant correction factor computation\n")
+      return -1
+
+    corrFactors = correction.computeInvariantFactors(XYZdata)
+    
+    # Get sensor object
+    sensor = self.sensorList[sensorID]
+    
+    #Store factors in sensor data
+    sensor.corrFactors = corrFactors
+    
+  
   def computeCorrectionFactorsVariant(self, sensorID, params):
     """ Compute correction factors for the time variant algorithm """
+    pass
 
-  def getRawMagData(self,  sensorID = 0):
+  def getRawMagData(self,  sensorID = 0, nrSamples = 1, sampleDelay = 0.25):
     """ Read magnetometer data from sensor registered on ID sensorID
         and return data without processing it with error correction
+        
     """
     # Test if we got a correct sensorID
     if not (sensorID in self.sensorList):
       print("Invalid sensor ID, please provide a valid sensor ID for data correction\n")
       return -1
- 
+    # Select
     sensor = self.sensorList[sensorID]
-    # Read single triplet of X Y Z magnetometer datag()
-    return sensor.getMag()
 
-  def getCorrectedMagData(self, sensorID = 0, algorithmType = 0):
+    XYZdata = []
+    magX = []
+    magY = []
+    magZ = []
+    for i in range(nrSamples):
+      # Read single triplet of X Y Z magnetometer datag()
+      (x, y, z) = sensor.device.getMag()
+      magX.append(x)
+      magY.append(y)
+      magZ.append(z)
+      # Delay between reads
+      time.sleep(sampleDelay)
+
+   
+    # Format as a numpy array of X,Y,Z data 
+    XYZdata = numpy.array([magX, magY, magZ])
+    
+    return XYZdata
+
+  def correctData(self, XYZdata, sensorID = 0, algorithmType = 0):
     """ Read magnetometer data from sensor registered on ID sensorID
         and return data which was processed for error correction using
         algorithm defined with algorithmType
         algorithmType == 0 uses time invariant correction algorithm
         algorithmType == 1 uses time   variant correction algorithm; which 
-        requires additional input parameters
+        requires additional input parameters (not complete yet)
     """	 
     # Test if we got a correct sensorID
     if not (sensorID in self.sensorList):
@@ -88,11 +146,82 @@ class BeagleSat(object):
       return -1
 
     sensor = self.sensorList[sensorID]
-    # Read single triplet of X Y Z magnetometer datag()
-    magX, magY, magZ = sensor.getMag()
- 
-    if (algorithmType == 0):
-       corrX, corrY, corrZ = invariantCorrection(magX, magY, magZ)
 
-    return corrX, corrY, corrZ 
+    # Get correction factors from sensor object
+    factors = sensor.corrFactors
+
+    if not factors:
+      print("Correction factors not saved in sensor.corrFactors. Did you run computeCorrectionFactors() ?")
+
+    # Reference magnitude of magnetic field
+    IGRF = sensor.IGRF
+
+    if (algorithmType == 0):
+       (corrX, corrY, corrZ) = correction.invariantCorrection(XYZdata, factors, IGRF)
+    
+    # pack corrected data
+    corrected = numpy.array([corrX, corrY, corrZ])
+
+    return corrected
+
+
+  # Convenience functions for storing/reading data
+  def storeData(self, XYZdata, file = './data/readouts', stampTime = 1):
+    """ Store collected data in a default format """
+      
+    # Construct filename; add date/time + other markers
+    if(stampTime):
+      filename =  file + timeStamp()
+    else:
+      filename =  file
+
+    # Does the file exist?
+    if not os.path.exists(os.path.dirname(filename)):
+      os.makedirs(os.path.dirname(filename))
+    # Write
+    with open(filename, 'w') as outcsv:
+      #configure writer to write a csv file
+      writer = csv.writer(outcsv, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
+      writer.writerow(['x_axis', 'y_axis', 'z_axis'])
+      for i in range(numpy.size(XYZdata, 1)):
+        #Write item to outcsv
+        writer.writerow([XYZdata[0, i], XYZdata[1, i], XYZdata[2, i]])
+
+    print("\nData stored\n")
+    return 0
+
+  def loadData(self, file):
+    """ Read data from a CSV file """
+    
+    dataX = []
+    dataY = []
+    dataZ = []
+    with open(file, "r") as f:
+      reader = csv.reader(f, delimiter=" ")
+      names = reader.next()
+      for row in reader:
+        (x, y, z) = row
+        dataX.append(float(x))
+        dataY.append(float(y))
+        dataZ.append(float(z))
+
+    # Reshape back to previous format of numpy.array (list of lists)
+    XYZdata = numpy.array([dataX, dataY, dataZ])
+    return XYZdata
+
+def timeStamp(fmt='%Y-%m-%d-%H-%M-%S'):
+  """ Get timestamp and patch it to the filename """
+  return datetime.datetime.now().strftime(fmt)
+
+class sensor(object):
+  """ Class that holds sensor object and its data """ 
+ 
+  def __init__(self): 
+    self.IGRF     = None      # Currenyly set IGRF value for comuptation, 
+                              # should be equal to global IGRF
+    self.corrFactors  = []    # 6 correction factors for offset and scaling
+    self.device   = None 
+
+
+
 

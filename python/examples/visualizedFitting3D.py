@@ -7,6 +7,9 @@ import random
 
 import argparse
 
+import bbio
+from beaglesat import beagleSat
+
 parser = argparse.ArgumentParser(description='Process a dataset and plot the data before and after')
 parser.add_argument('readFile', metavar='readFile', type=int,
                    help='Specifier for reading acc.txt (1) or generating \
@@ -36,7 +39,8 @@ z_surf = Bh * np.outer(np.ones_like(u), np.cos(v))
 # Temporary for testing
 read_file = args.readFile
 if(read_file): 
-    acc_f = open("acc.txt", 'r')                          
+    """
+  	acc_f = open("acc.txt", 'r')                          
     acc_x = []
     acc_y = []    
     acc_z = []         
@@ -51,10 +55,15 @@ if(read_file):
         acc_x.append(int(reading[0]) / 16384.0 * 2 + ox)    
         acc_y.append(int(reading[1]) / 16384.0 * 3 + oy)    
         acc_z.append(int(reading[2]) / 16384.0 * 1 + oz)    
+    """
+  
+    Laika = BeagleSat()
+    
+    XYZdata = Laika.loadData('./data/tempStore')
 
-    x = np.array(acc_x)
-    y = np.array(acc_y)
-    z = np.array(acc_z) 
+    x = XYZdata[0]
+    y = XYZdata[1]
+    z = XYZdata[2]
 else:
     # Generate simulated dataset from sphere dataset
     # Distort radii (scale)
@@ -100,7 +109,7 @@ else:
 
 
 # Fit data
-(offsets, scale) = calibrate(x, y, z)
+(offsets, scale) = Beaglesat.correction.computeInvariantFactors(x, y, z)
 
 print(offsets)
 print(scale)

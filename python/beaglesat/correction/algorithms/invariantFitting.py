@@ -46,6 +46,8 @@ def compute(x, y, z):
   B = A / X[3]
   C = A / X[4]
 
+  print(A, B, C)
+
 	# Scaling values 
   SCx = numpy.sqrt(A)
   SCy = numpy.sqrt(B)
