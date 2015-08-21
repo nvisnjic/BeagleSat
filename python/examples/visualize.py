@@ -1,12 +1,13 @@
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-from cal_lib import *
 
-import numpy as np
+import numpy 
 import random
 
 import argparse
 import csv
+
+import beaglesat.correction.algorithms as BeagleCorrection
 
 
 def visualize3D():
@@ -17,20 +18,21 @@ def visualize3D():
     ax = fig.add_subplot(111, projection="3d", aspect="equal")
 
       
-    XYZdata = loadData("./testReads")
+    XYZdata = loadData("../data/referenceData")
+    #XYZdata = loadData("../data/magData2015-08-21-13-36-23")
    
-    print(XYZdata)
+    #print(XYZdata)
 
     x = XYZdata[0]
     y = XYZdata[1]
     z = XYZdata[2]
 
 
-    # Fit data
-    (offsets, scale) = calibrate(x, y, z)
+    # Fit data, same algorithm used in the computeCorrectedData() method
+    (offsets, scale) = BeagleCorrection.invariantFitting.compute(x, y, z)
 
-    print(offsets)
-    print(scale)
+    print("Offsets: %s" % (offsets))
+    print("Scaling: %s" % (scale))
 
     # For printing
     plot_x = x
@@ -44,7 +46,7 @@ def visualize3D():
 
     #Bh IGRF, magnitude of magnetic field to fit to
     Bh = max(numpy.mean(abs(x)), numpy.mean(abs(y)), numpy.mean(abs(z)))
-    print(Bh)
+    print("IGRF set based on mean value of measurements: Bh = %f" % (Bh)) 
     # fix scale
     fixed_x = fixed_x / scale[0] * Bh
     fixed_y = fixed_y / scale[1] * Bh
@@ -57,7 +59,7 @@ def visualize3D():
 
 
 
-    if(np.size(x) > 1000 ): # That's too much points
+    if(numpy.size(x) > 1000 ): # That's too much points
     #if(0 ): # That's too much points
         # Centimate (is that a word?) points for plotting
         # (too much points makes the graph slow)
@@ -73,15 +75,14 @@ def visualize3D():
 
     # Make a sphere dataset for comparison
     # Set of all spherical angles:
-    u = np.linspace(0, 2 * np.pi, 100)
-    v = np.linspace(0, np.pi, 100)
+    u = numpy.linspace(0, 2 * numpy.pi, 100)
+    v = numpy.linspace(0, numpy.pi, 100)
 
     # Cartesian coordinates that correspond to the spherical angles:
     # (this is the equation of an ellipsoid):
-    x_surf = Bh * np.outer(np.cos(u), np.sin(v))    
-    y_surf = Bh * np.outer(np.sin(u), np.sin(v))   
-    z_surf = Bh * np.outer(np.ones_like(u), np.cos(v))
-
+    x_surf = Bh * numpy.outer(numpy.cos(u), numpy.sin(v))    
+    y_surf = Bh * numpy.outer(numpy.sin(u), numpy.sin(v))   
+    z_surf = Bh * numpy.outer(numpy.ones_like(u), numpy.cos(v))
 
 
     # Plot sphere with radius Bh
@@ -103,18 +104,9 @@ def visualize3D():
 
 
 
-
 def loadData(file):
   """ Read data from a CSV file """
 
-  """
-  data = numpy.genfromtxt(file, dtype=float, delimiter=' ', names=True)
-
-  # Reshape back to previous format of numpy.array (list of lists)
-  Ldata = [list(elem) for elem in data]
-  XYZdata = numpy.reshape(Ldata, [3, len(Ldata)])
-  """
-  
   dataX = [] 
   dataY = [] 
   dataZ = [] 
@@ -122,7 +114,6 @@ def loadData(file):
     reader = csv.reader(f, delimiter=" ")
     names = reader.next()
     for row in reader:
-      print ', '.join(row)
       (x, y, z) = row
       dataX.append(float(x)) 
       dataY.append(float(y)) 
