@@ -1,15 +1,10 @@
-# BeagleSat
-A close relative of Laika.
+### BeagleSat
 
+# Intro
 
-No one knows it's true name, some say it goes by as:
+BeagleSat is an open-source nano satellite platform based on the BeagleBone
+embedded development board.
 
-* Cerberus
-* Anubis
-* DoberSat
-* FidoNode
-* HoundSat
-* Rover
-* Sparky
-
-and sometimes even Mr. Whiskers. Buy you better not say that to his face.
+It's a framework and tool set for designing your very own CubeSat from the
+ground up, while expanding the CubeSat community and bringing space that 
+much closer to anyone willing to hack. 
