@@ -10,7 +10,7 @@ import csv
 import beaglesat.correction.algorithms as BeagleCorrection
 
 
-def visualize3D():
+def visualize3D(rawDataFile):
     """ Helper function to visualize corrected data points """
 
 
@@ -18,7 +18,8 @@ def visualize3D():
     ax = fig.add_subplot(111, projection="3d", aspect="equal")
 
       
-    XYZdata = loadData("../data/referenceData")
+    XYZdata = loadData(rawDataFile)
+    #XYZdata = loadData("../data/referenceData")
     #XYZdata = loadData("../data/magData2015-08-21-13-36-23")
    
     #print(XYZdata)
@@ -123,5 +124,11 @@ def loadData(file):
   return XYZdata
 
 
-
-if __name__ == "__main__": visualize3D()
+if __name__ == "__main__": 
+    
+  parser = argparse.ArgumentParser(description='Process a dataset and plot the data before and after')
+  parser.add_argument('-f', metavar='filename',  required=True,
+          help=' Path to file for which to generate 3D plots')
+  args = parser.parse_args()
+  
+  visualize3D(args.f)
