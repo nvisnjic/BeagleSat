@@ -202,7 +202,7 @@ class BeagleSat(object):
         #Write item to outcsv
         writer.writerow([XYZdata[0, i], XYZdata[1, i], XYZdata[2, i]])
 
-    print("\nData stored\n")
+    print(("\nData stored in %s\n") % filename)
     return 0
 
   def loadData(self, file):
