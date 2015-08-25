@@ -10,7 +10,7 @@ import csv
 import beaglesat.correction.algorithms as BeagleCorrection
 
 
-def visualize3D(rawDataFile):
+def visualize3D(rawDataFile, correctedDataFile): 
     """ Helper function to visualize corrected data points """
 
 
@@ -28,52 +28,63 @@ def visualize3D(rawDataFile):
     y = XYZdata[1]
     z = XYZdata[2]
 
-
-    # Fit data, same algorithm used in the computeCorrectedData() method
-    (offsets, scale) = BeagleCorrection.invariantFitting.compute(x, y, z)
-
-    print("Offsets: %s" % (offsets))
-    print("Scaling: %s" % (scale))
-
-    # For printing
-    plot_x = x
-    plot_y = y
-    plot_z = z
-
-    # fix offset
-    fixed_x = x - numpy.ones(len(x)) * offsets[0] 
-    fixed_y = y - numpy.ones(len(y)) * offsets[1] 
-    fixed_z = z - numpy.ones(len(z)) * offsets[2] 
-
     #Bh IGRF, magnitude of magnetic field to fit to
     Bh = max(numpy.mean(abs(x)), numpy.mean(abs(y)), numpy.mean(abs(z)))
-    print("IGRF set based on mean value of measurements: Bh = %f" % (Bh)) 
-    # fix scale
-    fixed_x = fixed_x / scale[0] * Bh
-    fixed_y = fixed_y / scale[1] * Bh
-    fixed_z = fixed_z / scale[2] * Bh
+
+    if correctedDataFile is None:
+      # Corrected data file not set on input, then compute corrected data 
+      # using raw data from input file -f filename
+
+      # Fit data, same algorithm used in the computeCorrectedData() method
+      (offsets, scale) = BeagleCorrection.invariantFitting.compute(x, y, z)
+
+      print("Offsets: %s" % (offsets))
+      print("Scaling: %s" % (scale))
+
+
+      # fix offset
+      fixed_x = x - numpy.ones(len(x)) * offsets[0] 
+      fixed_y = y - numpy.ones(len(y)) * offsets[1] 
+      fixed_z = z - numpy.ones(len(z)) * offsets[2] 
+
+      # fix scale
+      fixed_x = fixed_x / scale[0] * Bh
+      fixed_y = fixed_y / scale[1] * Bh
+      fixed_z = fixed_z / scale[2] * Bh
+
+    else:
+      # Corrected data file set, use that data for plotting
+      corrected = loadData(correctedDataFile)
+  
+      fixed_x = corrected[0]
+      fixed_y = corrected[1]
+      fixed_z = corrected[2]
 
     # scale the point a bit out to print nicely outside the sphere
     plot_fixed_x = fixed_x * 1.02
     plot_fixed_y = fixed_y * 1.02
     plot_fixed_z = fixed_z * 1.02
 
-
-
+    # Print some points, not all
     if(numpy.size(x) > 1000 ): # That's too much points
-    #if(0 ): # That's too much points
         # Centimate (is that a word?) points for plotting
         # (too much points makes the graph slow)
-        plot_x = plot_x[0::100]
-        plot_y = plot_y[0::100]
-        plot_z = plot_z[0::100]
+        plot_x = x[0::100]
+        plot_y = y[0::100]
+        plot_z = z[0::100]
 
         plot_fixed_x = plot_fixed_x[0::100]
         plot_fixed_y = plot_fixed_y[0::100]
         plot_fixed_z = plot_fixed_z[0::100]
+    else: 
+      # For printing, original values stay in x, y & z
+      plot_x = x
+      plot_y = y
+      plot_z = z
 
 
-
+    print("IGRF set based on mean value of measurements: Bh = %f" % (Bh)) 
+    
     # Make a sphere dataset for comparison
     # Set of all spherical angles:
     u = numpy.linspace(0, 2 * numpy.pi, 100)
@@ -94,7 +105,7 @@ def visualize3D(rawDataFile):
     ax.scatter(plot_x, plot_y, plot_z, color="magenta")
 
     # plot corrected data
-    ax.scatter(plot_fixed_x, plot_fixed_y, plot_fixed_z, c="red")
+    ax.scatter(plot_fixed_x, plot_fixed_y, plot_fixed_z, c="blue")
 
     # Adjustment of the axes, so that they all have the same span:
     max_radius = max(max(plot_x), max(plot_y), max(plot_z)) * 1.2
@@ -129,6 +140,10 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Process a dataset and plot the data before and after')
   parser.add_argument('-f', metavar='filename',  required=True,
           help=' Path to file for which to generate 3D plots')
+  parser.add_argument('-c', metavar='correctedFile',  required=False,
+          help=" Path to corrected data file; if ommited will be generated from raw data given with -f")
   args = parser.parse_args()
-  
-  visualize3D(args.f)
+    
+  visualize3D(args.f, args.c)
+
+
