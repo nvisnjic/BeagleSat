@@ -112,6 +112,15 @@ def visualize3D(rawDataFile, correctedDataFile):
     for axis in 'xyz':
         getattr(ax, 'set_{}lim'.format(axis))((-max_radius, max_radius))
 
+    # Label axes    
+    ax.set_xlabel('X Axis')    
+    ax.set_ylabel('Y Axis')    
+    ax.set_zlabel('Z Axis')    
+    
+    # Add legend    
+    ax.legend([orig, corr, ref], ['Raw data', 'Corrected data', 'Reference sphere'])
+
+
     plt.show()
 
 
