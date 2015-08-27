@@ -1,5 +1,7 @@
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import matplotlib
+import matplotlib.patches as mpatches
 
 import numpy 
 import random
@@ -98,14 +100,14 @@ def visualize3D(rawDataFile, correctedDataFile):
 
 
     # Plot sphere with radius Bh
-    ax.plot_wireframe(x_surf, y_surf, z_surf,  rstride=4, cstride=4, color="blue", alpha=0.4)
+    ref = ax.plot_wireframe(x_surf, y_surf, z_surf,  rstride=4, cstride=4, color="blue", alpha=0.4)
             
 
-    # plot simulated or read data
-    ax.scatter(plot_x, plot_y, plot_z, color="magenta")
+    # plot read data
+    orig = ax.scatter(plot_x, plot_y, plot_z, color="magenta")
 
     # plot corrected data
-    ax.scatter(plot_fixed_x, plot_fixed_y, plot_fixed_z, c="blue")
+    corr = ax.scatter(plot_fixed_x, plot_fixed_y, plot_fixed_z, c="blue")
 
     # Adjustment of the axes, so that they all have the same span:
     max_radius = max(max(plot_x), max(plot_y), max(plot_z)) * 1.2
@@ -116,10 +118,13 @@ def visualize3D(rawDataFile, correctedDataFile):
     ax.set_xlabel('X Axis')    
     ax.set_ylabel('Y Axis')    
     ax.set_zlabel('Z Axis')    
+   
+    # Proxy artist, aka fakes for legend
+    orig_proxy = matplotlib.lines.Line2D([0],[0], linestyle="none", c='magenta', marker = '.', markersize = 15)
+    corr_proxy = matplotlib.lines.Line2D([0],[0], linestyle="none", c='blue', marker = '.', markersize = 15)
     
     # Add legend    
-    ax.legend([orig, corr, ref], ['Raw data', 'Corrected data', 'Reference sphere'])
-
+    ax.legend([orig_proxy, corr_proxy], ['Raw data', 'Corrected data'], numpoints = 1)
 
     plt.show()
 
