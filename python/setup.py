@@ -12,7 +12,7 @@ print ("Installing BeagleSat")
 from setuptools import setup, Extension, find_packages
 
 install_requires = [
-  #'PyBBIO',
+  'PyBBIO',
   'numpy'
 ]
 
@@ -22,7 +22,7 @@ setup(name='BeagleSat',
       long_description=open('README.md').read(),
       author='Niko Visnjic',
       author_email='self@nvisnjic.com',
-      license='GPLv2+',
+      license='GPLv3+',
       url='https://github.com/nvisnjic/BeagleSat',
       keywords=['BeagleBone Black', 'CubeSat', 'satellite',  
         'Ellipsoid fitting', 'sensordata processing', 'GPIO', 'I2C', 'SPI' ],
@@ -30,7 +30,7 @@ setup(name='BeagleSat',
       install_requires=install_requires,
       platforms=['BeagleBone', 'BeagleBone Black'],
       classifiers=[
-        'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv2+)',
         'Operating System :: POSIX :: Linux',
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
